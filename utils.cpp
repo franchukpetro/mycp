@@ -49,55 +49,64 @@ Args parse_arguments ( int argc, char * argv[] ){
 }
 
 int copy_file(std::string source, std::string target){
-    //char *src, *dst;
     int fdSrc, fdDst;
     struct stat sb;
 
 
     fdSrc = open(source.c_str(), O_RDONLY);
     if (fdSrc == -1){
+        std::cout<<"Open source file error"<<std::endl;
         //TODO: error handling here
     }
 
     if (fstat(fdSrc, &sb) == -1){
+        std::cout<<"fstat error"<<std::endl;
         //TODO: error handling here
     }
+
 
     if (sb.st_size == 0)
         exit(EXIT_SUCCESS);
 
-    const auto src = mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fdSrc, 0);
+
+    auto src = mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fdSrc, 0);
     if (src == MAP_FAILED){
+        std::cout<<"map src error"<<std::endl;
         //TODO: error handling here
     }
 
 
     fdDst = open(target.c_str(), O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
     if (fdDst == -1){
+        std::cout<<"Open target file"<<std::endl;
         //TODO: error handling here
     }
 
     if (ftruncate(fdDst, sb.st_size) == -1){
+        std::cout<<"ftruncate error"<<std::endl;
         //TODO: error handling here
     }
 
     auto dst = mmap(NULL, sb.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, fdDst, 0);
     if (dst == MAP_FAILED){
+        std::cout<<"map dst error"<<std::endl;
         //TODO: error handling here
     }
 
     memcpy(dst, src, sb.st_size);       /* Copy bytes between mappings */
     if (msync(dst, sb.st_size, MS_SYNC) == -1){
+        std::cout<<"memcpy error"<<std::endl;
         //TODO: error handling here
     }
 
-    exit(EXIT_SUCCESS);
 }
 
 int copy_files_to_dir(std::vector<std::string> files, std::string target_dir){
     for (int i=0; i < files.size(); i++){
         boost::filesystem::path p(files[i]);
         std::string targ_file = target_dir + "/" + p.filename().string();
-        copy_file(files[i], targ_file);
+        if (fs::is_regular_file(files[i])){
+            copy_file(files[i], targ_file);
+        }
     }
 }

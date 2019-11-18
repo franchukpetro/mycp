@@ -4,6 +4,7 @@
 
 int main(int argc, char * argv[]) {
     Args args;
+
     try{
         args = parse_arguments(argc, argv);
     }
@@ -12,16 +13,21 @@ int main(int argc, char * argv[]) {
         return -1;
     }
 
+    if (args.help){
+        std::cout<< "Help message"<<std::endl;
+        return 0;
+    }
 
-    //boost::filesystem::is_directory(args.pathes[-1]) ? copy_files_to_dir()
 
-    std::vector<std::string> files = std::vector<std::string>(args.pathes.begin(), args.pathes.end() - 1);
-    std::string target_dir = args.pathes[args.pathes.size() - 1];
+    if (fs::is_directory(args.pathes.back())){
+        std::vector<std::string> files = std::vector<std::string>(args.pathes.begin(), args.pathes.end() - 1);
+        std::string target_dir = args.pathes.back();
+        copy_files_to_dir(files, target_dir);
+    }
+    else{
+        copy_file(args.pathes[0], args.pathes.back());
+    }
 
-    //std::cout<<target_dir<<" ";
-
-    copy_files_to_dir(files, target_dir);
-
-    //copy_file(args.pathes[0], args.pathes[1]);
+    return 0;
 
 }

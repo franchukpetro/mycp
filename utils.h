@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/mman.h>
-
+#include <stdio.h>
 
 namespace fs = boost::filesystem;
 namespace po = boost::program_options;
