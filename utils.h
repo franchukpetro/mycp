@@ -5,6 +5,7 @@
 #include <string>
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -28,8 +29,5 @@ struct Args
 
 Args parse_arguments ( int argc, char * argv[] );
 
-int copy_file(std::string source, std::string target);
-
-int copy_files_to_dir(std::vector<std::string> files, std::string target_dir);
 
 #endif //MYCP_UTILS_H
