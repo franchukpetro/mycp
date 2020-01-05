@@ -19,8 +19,9 @@ int main(int argc, char * argv[]) {
     }
 
     //exit if in sources there is directory, but target is file
-    if ((fs::is_directory(args.pathes[0]) && fs::is_regular_file(args.pathes.back())) ||
-        (fs::is_directory(args.pathes[0]) && !fs::exists(args.pathes.back())))
+
+    // !!! works only if target file exists
+    if ((fs::is_directory(args.pathes[0]) && fs::is_regular_file(args.pathes.back())))
     {
         std::cout<<"Can not copy directory to the file!"<<std::endl;
         exit(1);
@@ -29,12 +30,27 @@ int main(int argc, char * argv[]) {
 
     for(int i=0; i < args.pathes.size() - 1; i++){
         std::string targ_file = args.pathes.back();
-        boost::filesystem::path p(args.pathes[i]);
+        fs::path p(args.pathes[i]);
 
-        if (fs::is_directory(args.pathes.back())){
+        if (fs::is_directory(args.pathes.back()) && fs::is_regular_file(args.pathes[i])){
             //add name of source file to path of target dir
             targ_file = args.pathes.back() + "/" + p.filename().string();
         }
+
+        if (fs::is_directory(args.pathes[i])){
+            if (args.recursive){
+
+                fs::create_directory((fs::path) args.pathes.back()/p.filename());
+                recursive_copy(args.pathes[i], args.pathes.back()/p.filename());
+                continue;
+            }
+            else {
+                //fs::copy(args.pathes[i], targ_file);
+                return -1;
+            }
+
+        }
+
 
         if (fs::exists(targ_file)){
 
@@ -65,7 +81,7 @@ int main(int argc, char * argv[]) {
         }
 
         else{
-            fs::copy(args.pathes[i], args.pathes.back());
+            fs::copy(args.pathes[i], targ_file);
         }
     }
 

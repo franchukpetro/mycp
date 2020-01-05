@@ -48,3 +48,53 @@ Args parse_arguments ( int argc, char * argv[] ){
 
 }
 
+void CopyRecursive(const fs::path& src, const fs::path& target) {
+    try {
+        for (const auto &dirEntry : fs::recursive_directory_iterator(src)) {
+            std::cout<<dirEntry<<std::endl;
+            const auto &p = dirEntry.path();
+
+            // Create path in target, if not existing.
+            const auto relativeSrc = fs::relative(p, src);
+            const auto targetParentPath = target / relativeSrc.parent_path();
+            std::cout<<targetParentPath<<std::endl;
+            if (!fs::exists(targetParentPath)){
+                fs::create_directories(targetParentPath);
+            }
+
+            // Copy to the targetParentPath which we just created.
+            if (fs::is_regular_file(p)){
+                fs::copy(p, targetParentPath);
+
+            } else if (fs::is_directory(p)){
+                fs::copy_directory(p, targetParentPath);
+            }
+
+        }
+    }
+    catch (std::exception &e) {
+        std::cout << e.what();
+    }
+
+}
+
+void copy_dir(std::string source, std::string target, bool rec){
+    if (rec){
+        CopyRecursive(source, target);
+    }
+    else {
+        fs::copy_directory(source, target);
+    }
+}
+
+void recursive_copy(const fs::path &src, const fs::path &dst){
+    if (fs::is_directory(src)) {
+        fs::create_directories(dst);
+        for (fs::directory_entry& item : fs::directory_iterator(src)) {
+            recursive_copy(item.path(), dst/item.path().filename());
+        }
+    }
+    else if (fs::is_regular_file(src)) {
+        fs::copy(src, dst);
+    }
+}
