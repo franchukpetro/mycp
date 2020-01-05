@@ -41,48 +41,16 @@ int main(int argc, char * argv[]) {
             if (args.recursive){
 
                 fs::create_directory((fs::path) args.pathes.back()/p.filename());
-                recursive_copy(args.pathes[i], args.pathes.back()/p.filename());
+                recursive_copy(args.pathes[i], args.pathes.back()/p.filename(), args.silent_mode);
                 continue;
             }
             else {
-                //fs::copy(args.pathes[i], targ_file);
                 return -1;
             }
 
         }
 
-
-        if (fs::exists(targ_file)){
-
-            if (!args.silent_mode){
-                std::string answer;
-
-                std::cout<<"Do you want to rewrite "<<p.filename().string()<<"?"<<std::endl;
-                std::cout<<"Y[es]/N[o]/A[ll]/C[ancel]"<<std::endl;
-                std::cin>> answer;
-                boost::algorithm::to_lower(answer);
-                if (answer == "y"){
-                    fs::copy_file(args.pathes[i], targ_file, fs::copy_option::overwrite_if_exists);
-                }
-                else if (answer == "n"){
-                    continue;
-                }
-                else if (answer == "a"){
-                    args.silent_mode = true;
-                }
-                else if (answer == "c"){
-                    exit(0);
-                }
-
-            }
-            else{
-                fs::copy_file(args.pathes[i], targ_file, fs::copy_option::overwrite_if_exists);
-            }
-        }
-
-        else{
-            fs::copy(args.pathes[i], targ_file);
-        }
+        args.silent_mode = my_copy_file(p, targ_file, args.silent_mode);
     }
 
 

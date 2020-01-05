@@ -31,9 +31,9 @@ struct Args
 
 Args parse_arguments ( int argc, char * argv[] );
 
-void CopyRecursive(const fs::path& src, const fs::path& target);
+void recursive_copy(const fs::path &src, const fs::path &dst, bool sm);
 
-void recursive_copy(const fs::path &src, const fs::path &dst);
+bool my_copy_file(const fs::path &src, const fs::path &dst, bool silent_mode);
 
 
 #endif //MYCP_UTILS_H
